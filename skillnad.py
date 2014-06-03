@@ -4,9 +4,7 @@ from joblib import Parallel, delayed
 
 import itertools
 import subprocess
-import os
-import re
-import PyPDF2
+import os, re, gzip
 
 options = {}
 
@@ -19,10 +17,12 @@ NEW = True
 
 dirs = ["old", "new"]
 texNames = ["main.tex", "main.tex"]
+synctexNames = ["main.synctex.gz", "main.synctex.gz"]
 pdfNames = ["main.pdf", "main.pdf"]
 outputDir = "diff"
 
 texFiles = [os.path.abspath(os.path.join(d,f)) for (d, f) in zip(dirs, texNames)]
+synctexFiles = [os.path.abspath(os.path.join(d,f)) for (d, f) in zip(dirs, synctexNames)] 
 pdfFiles = [os.path.abspath(os.path.join(d,f)) for (d, f) in zip(dirs, pdfNames)]
 
 
@@ -64,8 +64,12 @@ r"""}
 \end{document}
 """)
 
-# replace by using last lines of synctex file
-numberOfPages = [PyPDF2.PdfFileReader(pdfFiles[age]).getNumPages() for age in (OLD, NEW)]
+# get number of pages from synctex file
+def numPages(synctexFile):
+     with gzip.open(synctexFile, 'rb') as f:
+         return int(f.readlines()[-7][1:])
+
+numberOfPages = [numPages(synctexFiles[age]) for age in (OLD, NEW)]
 
 maxPages = max(numberOfPages[OLD], numberOfPages[NEW])
 

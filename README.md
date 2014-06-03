@@ -14,7 +14,6 @@ Dependencies
 
 * Python 2
 	* joblib (for running SyncTeX in parallel)
-	* PyPDF2 (for finding number of pages in PDF, soon to be replaced by reading synctex-files)
 * SyncTeX
 * pdflatex
 
