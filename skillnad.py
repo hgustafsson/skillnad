@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 
-from joblib import Parallel, delayed
+hasJoblib = False
+try:
+    from joblib import Parallel, delayed
+    hasJoblib = True
+except ImportError:
+    pass
 
 import itertools
 import subprocess
@@ -235,8 +240,12 @@ if __name__ == "__main__":
 
     matches = re.finditer(r"^(?P<old>[0-9,]+)(?P<mode>[adc])(?P<new>[0-9,]+)", diff, re.MULTILINE)
 
-    print "-> Making diff rects using SyncTeX"
-    hunkPairs = Parallel(n_jobs=4, verbose=5)(delayed(createHunkPair)(m.group("mode"), stringToRange(m.group("old")), stringToRange(m.group("new"))) for m in matches)
+    if hasJoblib:
+        print "-> Making diff rects using SyncTeX (in parallel)"
+        hunkPairs = Parallel(n_jobs=4, verbose=5)(delayed(createHunkPair)(m.group("mode"), stringToRange(m.group("old")), stringToRange(m.group("new"))) for m in matches)
+    else:
+        print "-> Making diff rects using SyncTeX (install joblib to run in parallel)"
+        hunkPairs = [createHunkPair(m.group("mode"), stringToRange(m.group("old")), stringToRange(m.group("new"))) for m in matches]
 
     if not os.path.exists(outputDir):
         os.makedirs(outputDir)

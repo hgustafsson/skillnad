@@ -13,7 +13,7 @@ Dependencies
 ============
 
 * Python 2
-	* joblib (for running SyncTeX in parallel)
+	* joblib (optional: for running SyncTeX in parallel)
 * SyncTeX
 * pdflatex
 
